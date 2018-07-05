@@ -1,12 +1,15 @@
 ---
-title: Investigating the exponential distribution in R and comparing it with the Central Limit Theorem
+title: Investigating the exponential distribution in R and comparing it with the Central
+  Limit Theorem
 author: "Vinicios Pereira"
-date: "02/07/2018"
+date: "05/07/2018"
 output:
-     html_document:
-          theme: cosmo
-          toc: true
-          fig_caption: true
+  html_document:
+    fig_caption: yes
+    theme: cosmo
+    toc: yes
+  pdf_document:
+    toc: yes
 ---
 
 ```{r setup, include=FALSE}
