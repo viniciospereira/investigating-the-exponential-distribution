@@ -161,7 +161,7 @@ ggplot(dfStandMeans, aes(sample = x)) +
      stat_qq(aes(colour = size)) +
      scale_fill_brewer(palette = "Paired") +
      ggtitle("FIGURE 5: Q-Q plot of the standardized Sample Means") +
-     labs(x = "Theoretical Quantiles", y = "Sample Quantiles", color = "size", fill = "bandtype") +
+     labs(x = "theoretical quantiles", y = "sample quantiles", color = "size", fill = "bandtype") +
      facet_grid(size ~ .)
 ```
 Again we can see how close the distribution with n = 40 is to the standard normal.
