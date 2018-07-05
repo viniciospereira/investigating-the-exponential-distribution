@@ -1,0 +1,167 @@
+---
+title: Investigating the exponential distribution in R and comparing it with the Central Limit Theorem
+author: "Vinicios Pereira"
+date: "02/07/2018"
+output:
+     html_document:
+          theme: cosmo
+          toc: true
+          fig_caption: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, cache = TRUE)
+require(ggplot2)
+require(ggpubr)
+require(plyr)
+require(qqplotr)
+```
+
+## Overview
+
+In this report, we will investigate the exponential distribution in R and compare it with the Central Limit Theorem. The exponential distribution can be simulated in R with rexp(n, lambda) where lambda is the rate parameter. The mean of the exponential distribution is 1/*lambda* and the standard deviation is also 1/*lambda*.
+
+
+## Simulations
+
+According to [Wikipedia](https://en.wikipedia.org/wiki/Exponential_distribution), the exponential distribution (also known as negative exponential distribution) is the probability distribution that describes the time between events in a Poisson point process, i.e., a process in which events occur continuously and independently at a constant average rate. It is a particular case of the gamma distribution.
+
+The mean or expected value of an exponentially distributed random variable X with rate parameter *lambda* is given by: **E[X] = 1/*lambda***. The variance of X is given by **Var[X] = 1/*lambda*^2** and the standart deviation is equal to the mean, ***sigma* = 1/*lambda***.
+
+For simulation propose, we will set ***lambda* = 0.2** for all cases. We will investigate the distribution of averages of **40** exponentials variables through **1000** simulations.
+
+```{r fig.width = 10, fig.height = 3}
+lambda = 0.2
+ggplot(data.frame(x=c(0,40)),aes(x=x)) + 
+     stat_function(fun=dexp, geom = "line", size = 2, col = "#9bcfe5", args = (mean=0.2)) +
+     scale_size_area(max_size = 30) +
+     ggtitle("FIGURE 1: Exponential distribution with lambda = 0.2") +
+     xlab("X") +
+     ylab("exp(x)") +
+     geom_vline(xintercept = 1/lambda, col = "#0075b7") +
+     scale_x_continuous(breaks = c(0 ,1/lambda, 2/lambda, 3/lambda, 4/lambda, 5/lambda, 6/lambda, 7/lambda, 
+                                   8/lambda))
+```
+
+FIGURE 1 shows the Exponencial distribution with *lambda* = 0.2. The vertical line represents the Theoretical Mean ***mu* = E[X] = 1/*lambda* = 5**. The values shown in the X axis represents the Teoretical Standart Deviation gaps, ***sigma* = 1/*lambda* = 5**. It means the Theoretical Variance is **Var[X] = 1/*lambda*^2 = 25**.
+
+```{r}
+mu = 1/lambda
+sigma = 1/lambda
+var = 1/lambda^2
+```
+
+To illustrate via simulation and associated explanatory text the properties of the distribution of the mean of 40 exponentials, we will:
+
+1. Show the sample mean and compare it to the theoretical mean of the distribution.
+2. Show how variable the sample is (via variance) and compare it to the theoretical variance of the distribution.
+3. Show that the distribution is approximately normal.
+
+Let's simulate n exp(X) 1000 times. We will simulate with n = 10, 25 and 40 to see how the distribution of the distribution of the averages, properly normalized, approach to a standard normal as the sample increases.
+
+```{r}
+# Number of simulations.
+nosim <- 1000
+
+# Set the seed to assure reproducibility.
+set.seed(885)
+# Create matrix 1000 X 10 with random values from exponential distribution lambda.
+mSimulation10 <- matrix(rexp(nosim * 10, lambda), nosim)
+# Create matrix 1000 X 25 with random values from exponential distribution lambda.
+mSimulation25 <- matrix(rexp(nosim * 25, lambda), nosim)
+# Create matrix 1000 X 40 with random values from exponential distribution lambda.
+mSimulation40 <- matrix(rexp(nosim * 40, lambda), nosim)
+
+# Function to standardize the simulations means.
+standMeanfunc <- function(x, n) (mean(x) - mu) / (sigma / sqrt(n))
+
+# Create a data frame with the standardized means for each simulation matrix.
+dfStandMeans <- data.frame(x = c(apply(mSimulation10, 1, standMeanfunc, 10), 
+                        apply(mSimulation25, 1, standMeanfunc, 25),
+                        apply(mSimulation40, 1, standMeanfunc, 40)),
+                  size = factor(rep(c(10, 25, 40), rep(nosim, 3))))
+
+# Create a data frame with the standardized means for each simulation matrix.
+dfVariance <- data.frame(x = c(apply(mSimulation10, 1, var), 
+                        apply(mSimulation25, 1, var),
+                        apply(mSimulation40, 1, var)),
+                  size = factor(rep(c(10, 25, 40), rep(nosim, 3))))
+```
+
+
+
+## Sample Mean versus Theoretical Mean
+
+
+```{r fig.width = 10, fig.height = 7}
+ggplot(dfStandMeans, aes(x = x)) + 
+     geom_histogram(alpha = .3, binwidth=.3, colour = "black", aes(y = ..density.., fill = size)) +
+     scale_fill_brewer(palette = "Paired") +
+     ggtitle("FIGURE 2: Density distribution of the standardized Sample Means") +
+     geom_vline(xintercept = 0, col = "#242424", size = .8) +
+     geom_vline(data = ddply(dfStandMeans, "size", summarize, m = mean(x)), aes(xintercept = m, col = size)) +
+     facet_grid(size ~ .)
+```
+The FIGURE 2 above, shows us how the coloured line (Sample Mean) approaches the grey line (Theoretical Mean) as the number of simulations increases. When the simulation group has n = 40, the Sample Mean seems to be exactly equal to the Theoretical Mean with the naked eye.
+
+As we saw above, the Theoretical Mean is 1/*lambda*, in this case, 1/0.2 = 5. However, to comparison propose, we standardized the mean density distribution. It means the mean is now **0**. The Sample Means are:
+```{r}
+mean(dfStandMeans[dfStandMeans$size == 10,]$x)
+mean(dfStandMeans[dfStandMeans$size == 25,]$x)
+mean(dfStandMeans[dfStandMeans$size == 40,]$x)
+```
+Respectively for n equals to 10, 25 and 40. We can how the Sample Mean is close to 0 for n = 40.
+
+
+## Sample Variance versus Theoretical Variance
+
+
+```{r fig.width = 10, fig.height = 7}
+ggplot(dfVariance, aes(x = x)) + 
+     geom_histogram(alpha = .3, binwidth=5, colour = "black", aes(y = ..density.., fill = size)) +
+     scale_fill_brewer(palette = "Paired") +
+     ggtitle("FIGURE 3: Density distribution of the Sample Variances") +
+     geom_vline(xintercept = var, col = "#242424", size = .8) +
+     geom_vline(data = ddply(dfVariance, "size", summarize, m = mean(x)), aes(xintercept = m, col = size)) +
+     facet_grid(size ~ .)
+```
+The FIGURE 3 above, shows us how the coloured line (Sample Variances Mean) approaches the grey line (Theoretical Variances Mean) as the number of simulations increases. When the simulation group has n = 40, the Sample Variances Mean seems to be exactly equal to the Theoretical Variances Mean with the naked eye.
+
+As we saw above, the Theoretical Variance is 1/*lambda*^2, in this case, 1/0.2^2 = **25**. The Sample Means are:
+```{r}
+mean(dfVariance[dfVariance$size == 10,]$x)
+mean(dfVariance[dfVariance$size == 25,]$x)
+mean(dfVariance[dfVariance$size == 40,]$x)
+```
+Respectively for n equals to 10, 25 and 40.
+
+
+
+## Normal Distribution
+
+
+The Central Limit Theorem states that the sampling distribution of the sample means approaches a normal distribution as the sample size gets larger — no matter what the shape of the population distribution.
+
+FIGURE 4 shows how the standardized Sample Means density curve (colorful line) approaches to the standard normal (dashed grey line) as the number of samples increases. When n = 40 the blue curve is pretty close to the standard normal.
+
+```{r fig.width = 10, fig.height = 7}
+ggplot(dfStandMeans, aes(x = x)) + 
+     geom_histogram(alpha = .3, binwidth=.3, colour = "black", aes(y = ..density.., fill = size)) +
+     scale_fill_brewer(palette = "Paired") +
+     ggtitle("FIGURE 4: Density distribution of the standardized Sample Means") +
+     stat_function(fun = dnorm, size = 1, colour = "#242424", linetype = "dashed") + 
+     geom_density(aes(colour = size, fill = NULL)) +
+     facet_grid(size ~ .)
+```
+Another way of visualizing the approximation of the standardized Sample Means distribution with the standard normal distribution is the use of a Q-Q plot. This is exactly what the FIGURE 5 does.
+```{r fig.width = 10, fig.height = 7}
+ggplot(dfStandMeans, aes(sample = x)) + 
+     geom_qq_band(bandType = "normal", mapping = aes(fill = "Normal")) +
+     stat_qq_line(mapping = aes(colour = "Normal")) +
+     stat_qq(aes(colour = size)) +
+     scale_fill_brewer(palette = "Paired") +
+     ggtitle("FIGURE 5: Q-Q plot of the standardized Sample Means") +
+     labs(x = "Theoretical Quantiles", y = "Sample Quantiles", color = "size", fill = "bandtype") +
+     facet_grid(size ~ .)
+```
+Again we can see how close the distribution with n = 40 is to the standard normal.
