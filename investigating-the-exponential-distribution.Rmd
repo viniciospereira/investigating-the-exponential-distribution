@@ -160,7 +160,7 @@ Another way of visualizing the approximation of the standardized Sample Means di
 ```{r fig.width = 10, fig.height = 7}
 ggplot(dfStandMeans, aes(sample = x)) + 
      geom_qq_band(bandType = "normal", mapping = aes(fill = "Normal")) +
-     stat_qq_line(mapping = aes(colour = "Normal")) +
+     stat_qq_line(mapping = aes(colour = size)) +
      stat_qq(aes(colour = size)) +
      scale_fill_brewer(palette = "Paired") +
      ggtitle("FIGURE 5: Q-Q plot of the standardized Sample Means") +
