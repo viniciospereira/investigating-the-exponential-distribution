@@ -36,14 +36,15 @@ For simulation propose, we will set ***lambda* = 0.2** for all cases. We will in
 ```{r fig.width = 10, fig.height = 3}
 lambda = 0.2
 ggplot(data.frame(x=c(0,40)),aes(x=x)) + 
-     stat_function(fun=dexp, geom = "line", size = 2, col = "#9bcfe5", args = (mean=0.2)) +
+     stat_function(fun=dexp, geom = "line", size = 2, col = "#9bcfe5", 
+                   args = (mean=0.2)) +
      scale_size_area(max_size = 30) +
      ggtitle("FIGURE 1: Exponential distribution with lambda = 0.2") +
      xlab("X") +
      ylab("exp(x)") +
      geom_vline(xintercept = 1/lambda, col = "#0075b7") +
-     scale_x_continuous(breaks = c(0 ,1/lambda, 2/lambda, 3/lambda, 4/lambda, 5/lambda, 6/lambda, 7/lambda, 
-                                   8/lambda))
+     scale_x_continuous(breaks = c(0 ,1/lambda, 2/lambda, 3/lambda, 4/lambda, 5/lambda, 
+                                   6/lambda, 7/lambda, 8/lambda))
 ```
 
 FIGURE 1 shows the Exponencial distribution with *lambda* = 0.2. The vertical line represents the Theoretical Mean ***mu* = E[X] = 1/*lambda* = 5**. The values shown in the X axis represents the Teoretical Standart Deviation gaps, ***sigma* = 1/*lambda* = 5**. It means the Theoretical Variance is **Var[X] = 1/*lambda*^2 = 25**.
@@ -98,11 +99,13 @@ dfVariance <- data.frame(x = c(apply(mSimulation10, 1, var),
 
 ```{r fig.width = 10, fig.height = 7}
 ggplot(dfStandMeans, aes(x = x)) + 
-     geom_histogram(alpha = .3, binwidth=.3, colour = "black", aes(y = ..density.., fill = size)) +
+     geom_histogram(alpha = .3, binwidth=.3, colour = "black", aes(y = ..density.., 
+                                                                   fill = size)) +
      scale_fill_brewer(palette = "Paired") +
      ggtitle("FIGURE 2: Density distribution of the standardized Sample Means") +
      geom_vline(xintercept = 0, col = "#242424", size = .8) +
-     geom_vline(data = ddply(dfStandMeans, "size", summarize, m = mean(x)), aes(xintercept = m, col = size)) +
+     geom_vline(data = ddply(dfStandMeans, "size", summarize, m = mean(x)), 
+                aes(xintercept = m, col = size)) +
      facet_grid(size ~ .)
 ```
 The FIGURE 2 above, shows us how the coloured line (Sample Mean) approaches the grey line (Theoretical Mean) as the number of simulations increases. When the simulation group has n = 40, the Sample Mean seems to be exactly equal to the Theoretical Mean with the naked eye.
@@ -121,11 +124,13 @@ Respectively for n equals to 10, 25 and 40. We can how the Sample Mean is close 
 
 ```{r fig.width = 10, fig.height = 7}
 ggplot(dfVariance, aes(x = x)) + 
-     geom_histogram(alpha = .3, binwidth=5, colour = "black", aes(y = ..density.., fill = size)) +
+     geom_histogram(alpha = .3, binwidth=5, colour = "black", aes(y = ..density.., 
+                                                                  fill = size)) +
      scale_fill_brewer(palette = "Paired") +
      ggtitle("FIGURE 3: Density distribution of the Sample Variances") +
      geom_vline(xintercept = var, col = "#242424", size = .8) +
-     geom_vline(data = ddply(dfVariance, "size", summarize, m = mean(x)), aes(xintercept = m, col = size)) +
+     geom_vline(data = ddply(dfVariance, "size", summarize, m = mean(x)), 
+                aes(xintercept = m, col = size)) +
      facet_grid(size ~ .)
 ```
 The FIGURE 3 above, shows us how the coloured line (Sample Variances Mean) approaches the grey line (Theoretical Variances Mean) as the number of simulations increases. When the simulation group has n = 40, the Sample Variances Mean seems to be exactly equal to the Theoretical Variances Mean with the naked eye.
@@ -149,7 +154,8 @@ FIGURE 4 shows how the standardized Sample Means density curve (colorful line) a
 
 ```{r fig.width = 10, fig.height = 7}
 ggplot(dfStandMeans, aes(x = x)) + 
-     geom_histogram(alpha = .3, binwidth=.3, colour = "black", aes(y = ..density.., fill = size)) +
+     geom_histogram(alpha = .3, binwidth=.3, colour = "black", aes(y = ..density.., 
+                                                                   fill = size)) +
      scale_fill_brewer(palette = "Paired") +
      ggtitle("FIGURE 4: Density distribution of the standardized Sample Means") +
      stat_function(fun = dnorm, size = 1, colour = "#242424", linetype = "dashed") + 
@@ -162,9 +168,11 @@ ggplot(dfStandMeans, aes(sample = x)) +
      geom_qq_band(bandType = "normal", mapping = aes(fill = "Normal")) +
      stat_qq_line(mapping = aes(colour = size)) +
      stat_qq(aes(colour = size)) +
-     scale_fill_brewer(palette = "Paired") +
+     scale_color_brewer(palette = "Paired") +
+     scale_fill_brewer(palette = "YlOrRd") +
      ggtitle("FIGURE 5: Q-Q plot of the standardized Sample Means") +
-     labs(x = "theoretical quantiles", y = "sample quantiles", color = "size", fill = "bandtype") +
+     labs(x = "theoretical quantiles", y = "sample quantiles", color = "size", 
+          fill = "bandtype") +
      facet_grid(size ~ .)
 ```
 Again we can see how close the distribution with n = 40 is to the standard normal.
