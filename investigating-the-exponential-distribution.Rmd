@@ -4,11 +4,11 @@ title: Investigating the exponential distribution in R and comparing it with the
 author: "Vinicios Pereira"
 date: "05/07/2018"
 output:
+  pdf_document:
+    toc: yes
   html_document:
     fig_caption: yes
     theme: cosmo
-    toc: yes
-  pdf_document:
     toc: yes
 ---
 
@@ -97,7 +97,7 @@ dfVariance <- data.frame(x = c(apply(mSimulation10, 1, var),
 ## Sample Mean versus Theoretical Mean
 
 
-```{r fig.width = 10, fig.height = 7}
+```{r fig.width = 10, fig.height = 6}
 ggplot(dfStandMeans, aes(x = x)) + 
      geom_histogram(alpha = .3, binwidth=.3, colour = "black", aes(y = ..density.., 
                                                                    fill = size)) +
@@ -122,7 +122,7 @@ Respectively for n equals to 10, 25 and 40. We can how the Sample Mean is close 
 ## Sample Variance versus Theoretical Variance
 
 
-```{r fig.width = 10, fig.height = 7}
+```{r fig.width = 10, fig.height = 6}
 ggplot(dfVariance, aes(x = x)) + 
      geom_histogram(alpha = .3, binwidth=5, colour = "black", aes(y = ..density.., 
                                                                   fill = size)) +
@@ -152,7 +152,7 @@ The Central Limit Theorem states that the sampling distribution of the sample me
 
 FIGURE 4 shows how the standardized Sample Means density curve (colorful line) approaches to the standard normal (dashed grey line) as the number of samples increases. When n = 40 the blue curve is pretty close to the standard normal.
 
-```{r fig.width = 10, fig.height = 7}
+```{r fig.width = 10, fig.height = 6}
 ggplot(dfStandMeans, aes(x = x)) + 
      geom_histogram(alpha = .3, binwidth=.3, colour = "black", aes(y = ..density.., 
                                                                    fill = size)) +
@@ -163,7 +163,7 @@ ggplot(dfStandMeans, aes(x = x)) +
      facet_grid(size ~ .)
 ```
 Another way of visualizing the approximation of the standardized Sample Means distribution with the standard normal distribution is the use of a Q-Q plot. This is exactly what the FIGURE 5 does.
-```{r fig.width = 10, fig.height = 7}
+```{r fig.width = 10, fig.height = 6}
 ggplot(dfStandMeans, aes(sample = x)) + 
      geom_qq_band(bandType = "normal", mapping = aes(fill = "Normal")) +
      stat_qq_line(mapping = aes(colour = size)) +
